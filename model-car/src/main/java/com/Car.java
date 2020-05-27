@@ -1,7 +1,7 @@
 package com;
 
 public interface Car {
-    void move(String command);
+    void move(String command) throws Exception;
     int getPositionX();
     int getPositionY();
     String getOrientation();
