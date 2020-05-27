@@ -3,42 +3,17 @@ var py;
 var x;
 var y;
 var orientation;
+var steps = 1;
 var index = {
     init: function () {
         $("#forward").on('click', function () {
-            var parms = {
-                px: px,
-                py: py, x: x, y: y, orientation: orientation, type: "forward"
-            };
-
-            new Service("control").sendData(parms, function (data) {
-                if (data.result == "error") {
-                    alert("out of boundary");
-                    return;
-                }
-                orientation = data.orientation;
-                x = parseInt(data.x);
-                y = parseInt(data.y);
-                index.show();
-            });
+            index.control("forward")
         });
         $("#clockwise").on('click', function () {
-            var parms = {
-                px: px,
-                py: py, x: x, y: y, orientation: orientation, type: "clockwise"
-            };
-
-            new Service("control").sendData(parms, function (data) {
-                if (data.result == "error") {
-                    alert("out of boundary");
-                    return;
-                }
-                orientation = data.orientation;
-                x = parseInt(data.x);
-                y = parseInt(data.y);
-                index.show();
-            });
+            index.control("clockwise")
         });
+
+
         $("#set").on('click', function () {
             px = parseInt($("#columnNum").val());
             py = parseInt($("#rowNum").val());
@@ -46,34 +21,60 @@ var index = {
             y = 1;
             orientation = $("#orientationSelect").val();
             index.show();
-            var data =[{
-                id: 1,
-                name: 'Item 1',
-                price: '$1'
-            }];
-            $("table1").bootstrapTable("insertRow", data);
+            $("#table1").bootstrapTable('removeAll');
+            steps = 1
+            index.appendtable("init");
+
         });
         $("#table1").bootstrapTable({
             columns: [{
                 field: 'id',
-                title: 'Item ID'
+                title: 'steps'
             }, {
                 field: 'action',
-                title: 'Item Name'
+                title: 'action'
             }, {
-                field: 'price',
-                title: 'Item Price'
-            }],
-            data: [{
-                id: 1,
-                name: 'Item 1',
-                price: '$1'
-            }, {
-                id: 2,
-                name: 'Item 2',
-                price: '$2'
+                field: 'position',
+                title: 'position'
             }]
         })
+    },
+    control: function (type) {
+        var parms = {
+            px: px,
+            py: py, x: x, y: y, orientation: orientation, type: type
+        };
+
+        new Service("control").sendData(parms, function (data) {
+            if (data.result == "error") {
+                alert("out of boundary");
+                index.appendtable(type, "out of boundary");
+                return;
+            }
+            orientation = data.orientation;
+            x = parseInt(data.x);
+            y = parseInt(data.y);
+            index.show();
+            index.appendtable(type);
+        });
+
+    },
+    appendtable: function (action, message) {
+        var data
+        if (message == null) {
+            data = [{
+                id: steps++,
+                action: action,
+                position: "x:" + x + "  y:" + y + "  orientation:" + orientation
+            }];
+        } else {
+            data = [{
+                id: steps++,
+                action: action,
+                position: message
+            }];
+        }
+        $("#table1").bootstrapTable('append', data);
     },
     show: function () {
         $("#px").text(px);

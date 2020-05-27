@@ -15,7 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 @RequestMapping("/")
 public class DemoController {
 
-    @GetMapping("index")
+    @GetMapping("/")
     public String index(ModelMap map) {
         map.put("welcome", "5 YEARS CAR");
         return "index";
